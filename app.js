@@ -59,11 +59,6 @@ const login = sequelize.define('logins', {
     password: { 
         type: DataTypes.TEXT,
         allowNull: false
-    },
-
-    salt: { 
-        type: DataTypes.TEXT,
-        allowNull: false
     }
 
     }, {
@@ -174,15 +169,16 @@ app.get('/login', async function(req,res) {
 
         // validation for username and password here
 
-        var user_details = await login.findAll({
+        var user_details = await login.findOne({
             where: {
                 name: req.body.name
             }
         });
 
-        if(user_details.length > 0)
+        if(user_details)
         {
             var token = jwt.sign(user_details, 'shhhhh', { algorithm: 'RS256'});
+
             res.status(200).json({
                 success: true,
                 token: token
