@@ -124,6 +124,50 @@ app.get('/', function (req,res) {
     return;
 });
 
+
+//******************************************************************************************
+//                                  AUTH MIDDLEWARE
+//******************************************************************************************
+
+
+var authHandler = function (req, res, next) {
+    
+    if(!req.get("X-AUTH-TOKEN"))
+    {
+        res.status(500).json({
+            success: false,
+            error: {
+                message: "token not passed"
+            }
+        });
+        return;
+    }
+
+    try{
+        var token = req.get("X-AUTH-TOKEN");
+
+        var user_credentials = jwt.verify(token, 'shhhhh');
+
+    }
+    catch(err){
+        console.log(err);
+        res.status(401).json({
+            success: false,
+            error: {
+                message: "Invalid Token"
+            }
+        });
+        return;
+    }
+    next();
+}
+
+//******************************************************************************************
+
+//******************************************************************************************
+//                                   LOGIN FUNCTION
+//******************************************************************************************
+
 app.get('/login', async function(req,res) {
 
     try{
@@ -165,37 +209,7 @@ app.get('/login', async function(req,res) {
 
 })
 
-var authHandler = function (req, res, next) {
-    
-    if(!req.get("X-AUTH-TOKEN"))
-    {
-        res.status(500).json({
-            success: false,
-            error: {
-                message: "token not passed"
-            }
-        });
-        return;
-    }
-
-    try{
-        var token = req.get("X-AUTH-TOKEN");
-
-        var user_credentials = jwt.verify(token, 'shhhhh');
-
-    }
-    catch(err){
-        console.log(err);
-        res.status(401).json({
-            success: false,
-            error: {
-                message: "Invalid Token"
-            }
-        });
-        return;
-    }
-    next();
-}
+//******************************************************************************************
 
 app.get('/api/user/data', authHandler, async function (req,res) {
 
@@ -213,7 +227,8 @@ app.get('/api/user/data', authHandler, async function (req,res) {
         res.status(200).json({
             success: true,
             data: values
-        })
+        });
+        return;
 
    } catch(err){
     
@@ -223,6 +238,7 @@ app.get('/api/user/data', authHandler, async function (req,res) {
             success: false,
             error: `internal server ERROR: ${err} `
         });
+        return;
    }
 })
 
@@ -244,7 +260,8 @@ app.get('/api/car/data', authHandler, async function (req,res) {
         res.status(200).json({
             success: true,
             data: values
-        })
+        });
+        return;
 
    } catch (err) {
 
@@ -252,6 +269,7 @@ app.get('/api/car/data', authHandler, async function (req,res) {
             success: false,
             error: `internal server ERROR: ${err} `
         });
+        return;
    }
 })
 
@@ -275,7 +293,8 @@ app.post('/api/post/user', authHandler, async function (req, res) {
         res.status(200).json({
             success: true,
             data: createdData
-        })
+        });
+        return;
         
     } catch (err) {
 
@@ -283,6 +302,7 @@ app.post('/api/post/user', authHandler, async function (req, res) {
             success: false,
             error: `internal server ERROR: ${err} `
         });   
+        return;
     }
 })
 
@@ -303,7 +323,8 @@ app.post('/api/post/car', authHandler, async function (req, res) {
         res.status(200).json({
             success: true,
             data: createdData
-        })
+        });
+        return;
         
     } catch (err) {
 
@@ -311,5 +332,6 @@ app.post('/api/post/car', authHandler, async function (req, res) {
             success: false,
             error: `internal server ERROR: ${err} `
         });   
+        return;
     }
 })
